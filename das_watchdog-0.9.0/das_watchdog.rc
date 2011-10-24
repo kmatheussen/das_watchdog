@@ -1,0 +1,49 @@
+#! /bin/sh
+#
+#Written by Miquel van Smoorenburg <miquels at cistron.nl>.
+#Modified for Debian GNU/Linux
+#by Ian Murdock <imurdock at gnu.ai.mit.edu>.
+#               Modified for das_watchdog by <sk>
+
+# Stefan kerstens comments:
+# i've attached a simple /etc/init.d script; on debian you can
+# do:
+# cp das_watchdog.rc /etc/init.d/das_watchdog
+# update-rc.d das_watchdog defaults
+# invoke-rc.d das_watchdog start
+
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/local/sbin/das_watchdog
+NAME=das_watchdog
+DESC="Watchdog"
+
+test -x $DAEMON || exit 0
+
+set -e
+
+case "$1" in
+    start)
+	echo -n "Starting $DESC: $NAME"
+	start-stop-daemon --start --quiet --background --exec $DAEMON
+	echo "."
+	;;
+  stop)
+	echo -n "Stopping $DESC: $NAME"
+	start-stop-daemon --stop --quiet --oknodo --exec $DAEMON
+	echo "."
+	;;
+    restart|reload|force-reload)
+	echo -n "Restarting $DESC: $NAME... "
+	start-stop-daemon --stop --quiet --oknodo --exec $DAEMON
+	start-stop-daemon --start --quiet --background --exec $DAEMON
+	echo "done."
+        ;;
+    *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

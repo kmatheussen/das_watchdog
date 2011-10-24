@@ -1,0 +1,172 @@
+
+
+Das_Watchdog V0.9.0
+Released 14.2.2009
+
+Kjetil S. Matheussen, k.s.matheussen@notam02.no
+
+
+ABOUT
+-----
+Das_Watchdog is a general watchdog for the linux operating system that
+should run in the background at all times to ensure a realtime process
+won't hang the machine.
+
+Das_Watchdog is inspired by the rt_watchdog program
+made by Florian Schmidt: http://tapas.affenbande.org/?page_id=38
+
+But das_watchdog has some improvements over rt_watchdog:
+
+1. It works with 2.4 kernels as well as 2.6.
+2. Instead of permanently setting all realtime processes to run non-realtime, das_watchdog
+   only sets them temporary.
+3. When the watchdog kicks in, an X window should pop up that tells you whats happening.
+   (just close it after reading the message).
+
+
+
+REQUIREMENTS
+------------
+xmessage (should be a part of X11)
+libgtop2 (should be included with gnome. No, das_watchdog is not a gnome-program, it
+          only uses libgtop2.)
+
+
+
+COMPILATION
+----------
+make
+
+
+FEDORA INSTALLATION
+-------------------
+cp das_watchdog /usr/local/sbin/
+echo '/usr/local/sbin/das_watchdog >/dev/null &' >>/etc/rc.sysinit
+reboot
+
+
+GENTOO INSTALLATION
+-------------------
+# from the proaudio repository:
+emerge -va das_watchdog
+reboot
+
+
+DEBIAN INSTALLATION
+-------------------
+cp das_watchdog /usr/local/sbin/
+cp das_watchdog.rc /etc/init.d/das_watchdog
+update-rc.d das_watchdog defaults
+invoke-rc.d das_watchdog start
+reboot
+
+
+USAGE
+-----
+
+Whenever a program locks up the machine, the watchdog temporarily sets all
+realtime process to non-realtime for 8 seconds. You will get an xmessage window
+up on the screen whenever that happens.
+
+To test it, run the attached program "test_rt", which immediatley freezes your
+machine. However, a window should pop up after about 5-6 seconds telling you
+that the watchdog set the process to non-realtime. (If you have two processors,
+you must run test_rt two times, and so on.)
+
+
+
+
+
+
+CHANGES
+-------
+0.3.2->0.9.0
+* Removed timer process testing. This was only a problem with older 2.6
+  kernels. (think it was fixed early 2006 or thereabout). No scary
+  messages printed to the screen anymore.
+* Tested on Fedora core 10.
+* Cleaned up documentation a bit and added instructions for installing on
+  Fedora, Gentoo and Debian.
+
+0.3.1->0.3.2
+*Fixed manual. Newer linux kernels all seems to have properly working timing, so using
+ the --force option should never be necessary anymore.
+
+0.2.5->0.3.1
+*Changed scheme for finding correct XAUTHORITY environment variable.
+  (Now works with Fedora Core 6)
+  Hopefully, these changes should increase the chance of seeing the
+  xmessage and avoid seeing multiple ones. (Theres no correct way to do
+  this, so please send me the output of "uname -a" in case you don't see
+  any window)
+*Added syslogging.
+*Added the --version argument.
+
+0.2.4->0.2.5
+*Let the test thread run with SCHED_FIFO priority as well, using the lowest priority.
+
+0.2.3->0.2.4
+*Test if the xmessage program found during the make process is a valid executable.
+ If not, search the $PATH instead. This should fix it for Gentoo when the pro-audio
+ overlay is updated to at least this version.
+*Various modifications for the High Res Timer, which should be used instead of setting the
+ timer interrupt process to SCHED_FIFO/99.
+
+0.2.2->0.2.3
+*Fixed commandline arguments for increasetime, checktime and waittime.
+*Nicified source a bit
+
+0.2.1->0.2.2
+*Locked down memory. Don't know if its necessary.
+
+0.2.0->0.2.1
+*Cleaned up source a bit.
+*Properly find number of timer processes.
+*Added shortcuts for optargs and beautified the source a bit.
+
+
+0.1.2->0.2.0
+*Don't do anything if no process priorities are changed, when watchdogging.
+*Added the --force option, that sets the priority of all timer processes to FIFO/99.
+*Added the das_watchdog /etc/init.d script provided by Stefan Kersten. (das_watchdog.rc)
+*Added the --verbose option.
+*Check that its the same process when setting back old priority.
+*Don't set back to old priority if the priority has been changed in the mean time.
+*Added options for setting increasetime, checktime and waittime.
+ (--increasetime, --checktime and --waittime)
+*Don't change the priority of any timer process when watchdogging.
+*Smaller code cleanups.
+
+
+0.1.1->0.1.2
+* Added check for the ksoftrqd/0 process as well as the softirq-timer/0 process.
+* Added check for SCHED_OTHER of the timing process as well as priority.
+* Removed debug-printing.
+
+0.1.0->0.1.1
+* Added extensive checks both when compiling and when running about the priority of the "softirq-timer/0"
+  process:
+  - ***If "softirq-timer/0" is not set to a very high priority (99), the watchdog most probably will not work.***
+  - The default priority for softirq-timer/0 seems to be 1. However, for real time work, it must be
+    set higher to get reliable timing. Set it to 99.
+  - If softirq-timer/0 is set to less than 99, das_watchdog will refuse to compile unless you force it to by
+    editing the makefile. When running das_watchdog, it will only give a warning if the priority is set too low.
+* Changed the DISPLAY environment variable to ":0.0" instead of "localhost:0.0". Seems to work for
+  everyone now.
+* Switched from libgtop to libgtop2.
+
+0.0.2->0.1.0
+* Properly setting the DISPLAY and XAUTHORITY environment variables in various ways to make sure
+  the message is really shown. (It really works now!)
+
+0.0.1->0.0.2
+*Use xmessage instead of wish. (much nicer)
+*Run system("xhost +") and setenv("DISPLAY",":0.0",1) before running xmessage.
+
+
+
+ACKNOWLEDGEMENT
+---------------
+The program is mentally based on Florian Schmidts program rt_watcdog. Florian Schmidt
+also wrote the test_rt program.
+
