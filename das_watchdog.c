@@ -316,9 +316,10 @@ static char *get_pid_environ_val(pid_t pid,char *val){
   sprintf(temp,"/proc/%d/environ",pid);
 
   fp=fopen(temp,"r");
-  if(fp==NULL)
+  if(fp==NULL){
+    free(temp);
     return NULL;
-
+  }
   
   for(;;){
     
@@ -330,17 +331,15 @@ static char *get_pid_environ_val(pid_t pid,char *val){
     temp[i]=fgetc(fp);    
 
     if(foundit==1 && (temp[i]==0 || temp[i]=='\0' || temp[i]==EOF)){
-      char *ret;
-      temp[i]=0;
-      ret=malloc(strlen(temp)+10);
-      sprintf(ret,"%s",temp);
       fclose(fp);
-      return ret;
+      temp[i]=0;
+      return temp;
     }
 
     switch(temp[i]){
     case EOF:
       fclose(fp);
+      free(temp);
       return NULL;
     case '=':
       temp[i]=0;
