@@ -306,7 +306,9 @@ static int checksoftirq(int force){
 
 
 static char *get_pid_environ_val(pid_t pid,char *val){
-  char temp[500];
+  int temp_size = 500;
+  char *temp = malloc(temp_size);
+  
   int i=0;
   int foundit=0;
   FILE *fp;
@@ -319,6 +321,12 @@ static char *get_pid_environ_val(pid_t pid,char *val){
 
   
   for(;;){
+    
+    if (i >= temp_size) {
+      temp_size *= 2;
+      temp = realloc(temp, temp_size);
+    }
+      
     temp[i]=fgetc(fp);    
 
     if(foundit==1 && (temp[i]==0 || temp[i]=='\0' || temp[i]==EOF)){
