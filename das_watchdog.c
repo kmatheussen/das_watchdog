@@ -330,7 +330,7 @@ static char *get_pid_environ_val(pid_t pid,char *val){
       
     temp[i]=fgetc(fp);    
 
-    if(foundit==1 && (temp[i]==0 || temp[i]=='\0' || temp[i]==EOF)){
+    if(foundit==1 && (temp[i]=='\0' || temp[i]==EOF)){
       fclose(fp);
       temp[i]=0;
       return temp;
