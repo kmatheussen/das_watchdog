@@ -567,8 +567,6 @@ int main(int argc,char **argv){
 	   && (!is_a_member(pll->proclist[lokke].pid,timerpids,num_cpus))
 	   )
 	  {
-	    struct sched_param par={0};
-	    par.sched_priority=0;
 	    if(verbose)
 	      print_error(stdout,"Setting pid %d temporarily to SCHED_OTHER.",pll->proclist[lokke].pid);
 	    if(set_pid_priority(pll->proclist[lokke].pid,SCHED_OTHER,0,"Could not set pid %d (\"%s\") to SCHED_OTHER (%s).\n","no name"))
@@ -600,8 +598,6 @@ int main(int argc,char **argv){
 			    "Seems like someone else has changed priority and/or scheduling policy for %d in the mean time. I'm not going to do anything.",
 			    pll->proclist[lokke].pid);
 	      }else{
-		struct sched_param par={0};
-		par.sched_priority=pll->proclist[lokke].priority;
 		if(verbose)
 		  print_error(stdout,"Setting pid %d back to realtime priority.",pll->proclist[lokke].pid);
 		set_pid_priority(pll->proclist[lokke].pid,pll->proclist[lokke].policy,pll->proclist[lokke].priority,"Could not set pid %d (\"%s\") to SCHED_FIFO/SCHED_RR (%s).\n\n", "no name");
