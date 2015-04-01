@@ -322,21 +322,20 @@ static char *get_pid_environ_val(pid_t pid,char *val){
   }
   
   for(;;){
-    
+    int c = fgetc(fp);
+
     if (i >= temp_size) {
       temp_size *= 2;
       temp = realloc(temp, temp_size);
     }
-      
-    temp[i]=fgetc(fp);    
 
-    if(foundit==1 && (temp[i]=='\0' || temp[i]==EOF)){
+    if(foundit==1 && (c=='\0' || c==EOF)){
       fclose(fp);
       temp[i]=0;
       return temp;
     }
 
-    switch(temp[i]){
+    switch(c){
     case EOF:
       fclose(fp);
       free(temp);
@@ -349,9 +348,11 @@ static char *get_pid_environ_val(pid_t pid,char *val){
       i=0;
       break;
     case '\0':
+      temp[i]=0;
       i=0;
       break;
     default:
+      temp[i]=c;
       i++;
     }
   }
