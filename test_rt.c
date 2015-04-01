@@ -4,6 +4,8 @@
 #include <sys/time.h>
 #include <time.h>
 #include <sched.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 int main() {
 	struct sched_param params;
