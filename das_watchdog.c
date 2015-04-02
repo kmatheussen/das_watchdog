@@ -51,14 +51,14 @@ typedef u_int64_t ui64;
 typedef guint64 ui64;
 #endif
 
-#define OPTARGS_BEGIN(das_usage) {int lokke;const char *usage=das_usage;for(lokke=1;lokke<argc;lokke++){char *a=argv[lokke];if(!strcmp("--help",a)||!strcmp("-h",a)){printf(usage);return 0;
+#define OPTARGS_BEGIN(das_usage) {int lokke;const char *usage=das_usage;for(lokke=1;lokke<argc;lokke++){char *a=argv[lokke];if(!strcmp("--help",a)||!strcmp("-h",a)){printf("%s", usage);return 0;
 #define OPTARG(name,name2) }}else if(!strcmp(name,a)||!strcmp(name2,a)){{
 #define OPTARG_GETINT() atoi(argv[++lokke])
 #define OPTARG_GETFLOAT() atof(argv[++lokke])
 #define OPTARG_GETSTRING() argv[++lokke]
 #define OPTARG_LAST() }}else if(lokke==argc-1){lokke--;{
 #define OPTARGS_ELSE() }else if(1){
-#define OPTARGS_END }else{fprintf(stderr,usage);return(-1);}}}
+#define OPTARGS_END }else{fprintf(stderr,"%s",usage);return(-1);}}}
 
 
 static int increasetime=1; // Seconds between each time the SCHED_OTHER thread is increasing the counter.
@@ -93,7 +93,7 @@ static void print_error(FILE *where,char *fmt, ...) {
   va_start(ap, fmt);{
     vsnprintf (temp, 9998, fmt, ap);
   }va_end(ap);
-  syslog(LOG_INFO,temp);
+  syslog(LOG_INFO,"%s",temp);
   if(where!=NULL)
     fprintf(where,"Das_Watchdog: %s\n",temp);
 }
@@ -322,21 +322,20 @@ static char *get_pid_environ_val(pid_t pid,char *val){
   }
   
   for(;;){
-    
+    int c = fgetc(fp);
+
     if (i >= temp_size) {
       temp_size *= 2;
       temp = realloc(temp, temp_size);
     }
-      
-    temp[i]=fgetc(fp);    
 
-    if(foundit==1 && (temp[i]==0 || temp[i]=='\0' || temp[i]==EOF)){
+    if(foundit==1 && (c=='\0' || c==EOF)){
       fclose(fp);
       temp[i]=0;
       return temp;
     }
 
-    switch(temp[i]){
+    switch(c){
     case EOF:
       fclose(fp);
       free(temp);
@@ -349,9 +348,11 @@ static char *get_pid_environ_val(pid_t pid,char *val){
       i=0;
       break;
     case '\0':
+      temp[i]=0;
       i=0;
       break;
     default:
+      temp[i]=c;
       i++;
     }
   }
