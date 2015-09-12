@@ -9,7 +9,9 @@
 
 int main() {
 	struct sched_param params;
-	int done = 0;
+	// "done" is volatile to prevent the compiler from optimising the
+	// time-wasting loops below into nothing.
+	volatile int done = 0;
 	struct timeval tv;
 	time_t startsec;
 	unsigned long int loops;
