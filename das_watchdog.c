@@ -27,6 +27,7 @@
 #include <stdarg.h>
 
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #include <pthread.h>
 #include <pwd.h>
@@ -608,6 +609,9 @@ int main(int argc,char **argv){
       pll_delete(pll);
     }
     if(testing==1) break;
+
+    // Clean up any child processes.
+    waitpid(-1, NULL, WNOHANG);
   }
   
   return 0;
